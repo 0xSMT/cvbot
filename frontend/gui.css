@@ -1,0 +1,83 @@
+#images {
+    width: 100%;
+    text-align: center;
+}
+
+.eye {
+    width: 100%;
+}
+
+body {
+    height: 100%;
+}
+
+html {
+    height: 95%;
+}
+
+.connection {
+    background-color: red;
+    min-height: 10px;
+    width: 100%;
+}
+
+#log {
+    /* width: 100%; */
+    min-height: 100%;
+    resize: none;
+    width: 95%;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: small;
+    padding: 3px;
+}
+/* make a left and right class, which only include float: left and float: right respectively*/
+#lefteye {
+    float: left;
+    width: 49.5%;
+}
+
+#righteye {
+    float: right;
+    width: 49.5%;
+}
+
+#leftbox {
+    width: 70%;
+    float: left;
+    height: 100%;
+}
+
+#rightbox {
+    width: 29%;
+    float: right;
+    height: 100%;
+}
+
+#ipdiv {
+    width: 100%;
+    display: flex;
+    padding: 5px;
+}
+
+#setip {
+    float:right;
+    padding: 10px;
+}
+
+.label {
+    float: left;
+    position: relative;
+    transform: translateY(25%);
+}
+
+#ipinput {
+    margin-left: 10px;
+    margin-right: 10px;
+    overflow: auto;
+    flex-grow: 1;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#robotconnection {
+    width: 100%;
+}

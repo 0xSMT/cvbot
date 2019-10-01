@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <title>TU NASA RMC Front End</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width">
+
+        <script type="text/javascript" src="./lib/jquery.min.js"></script>
+
+        <!-- https://www.eclipse.org/paho/clients/js/ -->
+        <script type="text/javascript" src="./lib/mqtt.min.js"></script>
+        <script src="./gui.js"></script>
+
+        <link rel="stylesheet" href="./gui.css">
+    </head>
+
+    <!------------------------------------------------------------------------------>
+
+    <body>
+        <div id="leftbox">
+            <div id="images">
+                <div id="lefteye">
+                    <img class="eye" id="leftimg" src="./img/l.png"></img>
+                    <div class="connection" id="leftconnection"></div>
+                </div>
+                <div id="righteye">
+                    <img class="eye" id="rightimg" src="./img/r.png"></img>
+                    <div class="connection" id="rightconnection"></div>
+                </div>
+            </div>
+
+            <div id="ipdiv">
+                <div class="label">Robot IP</div>
+                <input type="text" name="ip" id="ipinput" value="127.0.0.1">
+                <button id="setip">Set IP</button>
+            </div>
+            <div class="connection" id="robotconnection"></div>
+
+            <hr width="75%">
+
+            <div>
+                dicks
+            </div>
+        </div>
+
+        <div id="rightbox">
+            <b>Logged Events</b>
+            <textarea readonly id="log">> GUI Launched</textarea>
+        </div>
+    </body>
+</html>
