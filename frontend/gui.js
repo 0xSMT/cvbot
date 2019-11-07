@@ -5,10 +5,12 @@ function logEvent(str) {
     let $log = $("#log");
     console.log(str);
     $log.val($log.val() + "\n> " + str);
+
+    $log.scrollTop($log[0].scrollHeight);
 }
 
 function txcallback(value, topic) {
-
+    
 }
 
 function rxcallback() {
@@ -53,7 +55,7 @@ function createController(gamepad, callback) {
 }
 
 function refresh(gp) {
-    for(var i = 0;i < gp.gp.buttons.length; i++) {
+    for(var i = 0; i < gp.gp.buttons.length; i++) {
         if(gp.gp.buttons[i].pressed && !gp.button_state[i]) {
             gp.button_state[i] = true;
             gp.callback(2 * i, "button");
@@ -93,8 +95,7 @@ function refresh(gp) {
 }
 
 var gamepads = {
-    "drive": null,
-    "mine": null
+    "drive": null
 };
 
 var gamepadList = [];
@@ -137,14 +138,10 @@ function refreshGamepads() {
 $(document).ready(function() {
 
     if(canGame()) {
-        // var prompt = "To begin using your gamepad, connect it and press any button!";
-        // $("#gamepadPrompt").text(prompt);
-
         $(window).on("gamepadconnected", function(e) {
             console.log(e)
-            // var gp = navigator.getGamepads()[e.gamepad.index];
             var gp = createController(navigator.getGamepads()[0], txcallback);
-
+            gamepads.drive = gp;
             gamepadList.push(gp);
             logEvent("connection event for gamepad " + gp.gp.id);
             repGP = window.setInterval(refreshGamepads, 50);
@@ -153,18 +150,8 @@ $(document).ready(function() {
         $(window).on("gamepaddisconnected", function(e) {
             console.log(e)
             logEvent("disconnection event for gamepad" + e.gamepad.id);
-            // $("#gamepadPrompt").text(prompt);
             window.clearInterval(repGP);
         });
-
-        //setup an interval for Chrome
-        // var checkGP = window.setInterval(function() {
-        //     // console.log('checkGP');
-        //     if(navigator.getGamepads()[0]) {
-        //         if(!hasGP) $(window).trigger("gamepadconnected");
-        //         window.clearInterval(checkGP);
-        //     }
-        // }, 500);
     }
 
 });
