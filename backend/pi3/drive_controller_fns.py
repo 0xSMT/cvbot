@@ -90,14 +90,17 @@ def on_right_joystick_move(rs, x, y):
 
     rs.stale = True
 
-def on_right_trigger_change(rs, val):
-    rospy.loginfo("drive rt changed")
+def on_right_trigger_release(rs, val):
+    rospy.loginfo("drive rt release")
 
-    # rs.auger_spin = val
-    # rs.stale = True
+def on_right_trigger_press(rs, val):
+    rospy.loginfo("drive rt press")
 
-def on_left_trigger_change(rs, val):
-    rospy.loginfo("drive rt changed")
+def on_left_trigger_release(rs, val):
+    rospy.loginfo("drive lt release")
+
+def on_left_trigger_press(rs, val):
+    rospy.loginfo("drive lt press")
 
 def on_dpad_up_press(rs):
     rospy.loginfo("drive dpad up pressed")

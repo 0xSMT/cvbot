@@ -32,7 +32,7 @@ if __name__ == '__main__':
         port = rospy.get_param('~port','/dev/ttyUSB0')
 
     if not baud:
-        baud = int(rospy.get_param('~baud','9600')) #57600
+        baud = int(rospy.get_param('~baud','57600')) #57600
 
     serial_client = SerialClient(port, baud)
 

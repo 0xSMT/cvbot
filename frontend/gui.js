@@ -1,6 +1,62 @@
 var hasGP = false;
 var repGP;
 
+var connected = false;
+
+// var client = new Paho.MQTT.Client(location.hostname, 1883, "clientId");
+var client = null;
+
+// var config = require('../config.json');
+// var config = null;
+
+// $.getJSON("../config.json", function(json) {
+//     console.log(json); // this will show the info it in firebug console
+//     config = json;
+// });
+
+// console.log(config);
+
+function make_on_connect(topics) {
+    let fn = function(reconnect, uri) {
+        connected = true
+        logEvent("MQTT CONNECTED!")
+
+        for (let index = 0; index < topics.length; index++) {
+            const topic = topics[index];
+            
+            client.subscribe(topic)
+        }
+    }
+
+    return fn
+}
+
+function make_on_message() {
+    let fn = function(msg) {
+        logEvent("MQTT RECV: " + msg.payloadString)
+    }
+
+    return fn
+}
+
+function onConnectionLost(responseObject) {
+    if (responseObject.errorCode !== 0) {
+        logEvent("onConnectionLost:"+responseObject.errorMessage);
+        connected = false
+    }
+}
+
+function connectMQTT() {
+    let ip = $("#ipinput").val()
+    logEvent("Connecting to [" + ip + "]...")
+    client = new Paho.MQTT.Client(ip, 9001, "front_end");
+
+    client.onConnectionLost = onConnectionLost;
+    client.onMessageArrived = make_on_message();
+
+    client.connect({onSuccess: make_on_connect(['li', 'ri'])});
+}
+
 function logEvent(str) {
     let $log = $("#log");
     console.log(str);
@@ -9,8 +65,16 @@ function logEvent(str) {
     $log.scrollTop($log[0].scrollHeight);
 }
 
-function txcallback(value, topic) {
-    
+function txcallback(msg, topic) {
+    if(client != null) {
+        logEvent("DRIVE\t-> " + topic + ":" + String(msg))
+
+        var sendMessage = new Paho.MQTT.Message(msg);
+        sendMessage.destinationName = config["controller"]["topics"]["drive"][topic];
+
+        // client.publish(config["controller"]["topics"]["drive"][topic], sendMessage);
+        client.send(sendMessage);
+    }
 }
 
 function rxcallback() {
@@ -58,12 +122,12 @@ function refresh(gp) {
     for(var i = 0; i < gp.gp.buttons.length; i++) {
         if(gp.gp.buttons[i].pressed && !gp.button_state[i]) {
             gp.button_state[i] = true;
-            gp.callback(2 * i, "button");
+            gp.callback(String(2 * i), "button");
 
             logEvent(button_label[i] + " pressed!");
         } else if(!gp.gp.buttons[i].pressed && gp.button_state[i]) {
             gp.button_state[i] = false;
-            gp.callback(2 * i + 1, "button");
+            gp.callback(String(2 * i + 1), "button");
 
             logEvent(button_label[i] + " released!");
         }
@@ -100,14 +164,6 @@ var gamepads = {
 
 var gamepadList = [];
 
-// function assignGamepads() {
-//     for(var key in gamepads) {
-//         if (!gamepads.hasOwnProperty(key)) continue;
-
-//         // do an alert for pressing a button on a controller for the associated controller (press A for 'key')
-//         logEvent("Press 'A' on the " + key + " controller!");
-//     }
-// }
 
 function canGame() {
     return "getGamepads" in navigator;
@@ -117,22 +173,6 @@ function refreshGamepads() {
     for(var i = 0; i < gamepadList.length; i++) {
         refresh(gamepadList[i]);
     }
-
-    // var gp = navigator.getGamepads()[0];
-    // var html = "";
-    //     html += "id: "+gp.id+"<br/>";
-
-    // for(var i=0;i<gp.buttons.length;i++) {
-    //     html+= "Button "+(i+1)+": ";
-    //     if(gp.buttons[i].pressed) html+= " pressed";
-    //     html+= "<br/>";
-    // }
-
-    // for(var i=0;i<gp.axes.length; i+=2) {
-    //     html+= "Stick "+(Math.ceil(i/2)+1)+": "+gp.axes[i]+","+gp.axes[i+1]+"<br/>";
-    // }
-
-    // $("#gamepadDisplay").html(html);
 }
 
 $(document).ready(function() {

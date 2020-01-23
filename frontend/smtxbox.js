@@ -35,10 +35,10 @@ function createController(gamepad, callback) {
             for(var i = 0;i < this.gp.buttons.length; i++) {
                 if(this.gp.buttons[i].pressed && !this.button_state[i]) {
                     this.button_state[i] = true;
-                    this.callback(2 * i, "button");
+                    this.callback([2 * i], "button");
                 } else if(!this.gp.buttons[i].pressed && this.button_state[i]) {
                     this.button_state[i] = false;
-                    this.callback(2 * i + 1, "button");
+                    this.callback([2 * i + 1], "button");
                 }
             }
 

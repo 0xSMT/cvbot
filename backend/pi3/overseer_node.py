@@ -25,26 +25,35 @@ import shlex, subprocess
 
 control_process = None
 serial_avr_process = None
+
 started = False
 
 def make_image_callback(mqtt_client, topic):
     def screenshot_callback(msg):
         rospy.loginfo("got image:\n")
-        #rospy.loginfo(len(msg.data))
-        #rospy.loginfo("type: " + str(type(msg.data)))
         rospy.loginfo("publishing to topic: [" + topic + "]")
+        
         mqtt_client.publish(topic, msg.data)
     
     return screenshot_callback
 
-def make_forwarding_fn(publishersm):
+def make_forwarding_fn(publishersm, json_config):
     def conv_fn(sent_arr, topic):
         global control_process, started
 
         arr = [x.encode('UTF8') for x in sent_arr]
         as_str = ''.join(arr)
 
-        if as_str == '22':
+        # rospy.loginfo("[" + as_str + " vs " + str(json_config["controller"]["map"]["start"]) + "\n")
+        # rospy.loginfo(as_str)
+        # rospy.loginfo(str(json_config["controller"]["map"]["start_press"]))
+        # rospy.loginfo(topic)
+        # rospy.loginfo(json_config["controller"]["topics"]["drive"]["button"])
+
+        rospy.loginfo(as_str == str(json_config["controller"]["map"]["start_press"]))
+        rospy.loginfo(topic == json_config["controller"]["topics"]["drive"]["button"])
+
+        if as_str == str(json_config["controller"]["map"]["start_press"]) and topic == json_config["controller"]["topics"]["drive"]["button"]:
             if not started:
                 control_process = subprocess.Popen(shlex.split("rosrun cv_bot2 control_node.py")) # TODO
                 serial_avr_process = subprocess.Popen(shlex.split("rosrun cv_bot2 serial-ros.py")) # TODO
@@ -103,13 +112,13 @@ if __name__ == '__main__':
     for topic in mqtt_topics:
         publishers[topic] = rospy.Publisher(topic, String, queue_size=10)
 
-    map_fn = make_forwarding_fn(publishers)
+    map_fn = make_forwarding_fn(publishers, json_data)
 
-    mqtt_client = mqttc.Client()
+    mqtt_client = mqttc.Client(transport="websockets")
     mqtt_client.on_connect = make_on_connect(mqtt_topics)
     mqtt_client.on_message = make_on_message(map_fn)
 
-    mqtt_client.connect(server)
+    mqtt_client.connect(server, port=9001)
 
     rospy.Subscriber(json_data["ros"]["img_from_lefteye_topic"], UInt8MultiArray, make_image_callback(mqtt_client, json_data["ros"]["left_img_from_master_topic"]))
     rospy.Subscriber(json_data["ros"]["img_from_righteye_topic"], UInt8MultiArray, make_image_callback(mqtt_client, json_data["ros"]["right_img_from_master_topic"]))
